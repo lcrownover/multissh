@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    net-ssh (5.0.2)
+    parallel (1.12.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  net-ssh
+  parallel
+
+BUNDLED WITH
+   1.17.1
