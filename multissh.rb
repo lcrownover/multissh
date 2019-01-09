@@ -24,11 +24,16 @@ class Multissh
       worker = Worker.new(hostname=node, username=@username, password=@password, command=@command, stream=@stream, debug=@debug)
       tasks.append(worker)
     end
+
     results = Parallel.map(tasks) do |task|
+      # puts results
       task.go
     end
+
   end
 end
 
 mssh = Multissh.new
 mssh.run
+
+puts "\n"

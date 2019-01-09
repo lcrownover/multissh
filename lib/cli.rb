@@ -46,7 +46,7 @@ class Cli
     if password.nil?
       print 'Enter LDAP Password: '
       pw = STDIN.noecho(&:gets).chomp
-      puts ''
+      puts "\n\n"
     else
       pw = @options[:password]
     end
@@ -91,12 +91,24 @@ class Cli
           end
         end
       end
-      command_list.join('; ')
+      command_list.map! do |command|
+        command = format_command(command)
+      end
+      command = command_list.join('; ')
     else
-      command.chomp
+      command = command.chomp
+      command = format_command(command)
     end
   end
 
+  def format_command(command)
+    pre_command = ". ~/.bash_profile; "\
+                  "export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin; "
+    unless command[0..3] == 'sudo'
+      command = 'sudo ' + command
+    end
+    pre_command + command + ' 2>&1'
+  end
 
   def set_stream(stream)
     if stream.nil?
