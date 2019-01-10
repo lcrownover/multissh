@@ -21,9 +21,9 @@ class Cli
   def set_options
     @options = {}
     opt_parse = OptionParser.new do |opt|
-      opt.banner = 'Usage: multissh.rb --username lcrown --nodes "server1,server2" --command "echo \'hello\'"'
-      opt.on('--username USERNAME', 'REQUIRED: your LDAP username') { |o| @options[:username] = o }
-      opt.on('--password PASSWORD', 'OPTIONAL: your LDAP password') { |o| @options[:password] = o }
+      opt.banner = 'Usage: multissh.rb --username \'USERNAME\' --nodes "server1,server2" --command "echo \'hello\'"'
+      opt.on('--username \'USERNAME\'', 'REQUIRED') { |o| @options[:username] = o }
+      opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if not provided') { |o| @options[:password] = o }
       opt.on('--nodes NODES', 'REQUIRED: "server1,server2,server3" OR "@nodes.txt"') { |o| @options[:nodes] = o }
       opt.on('--command COMMAND', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
       opt.on('--stream', 'OPTIONAL: stream mode for command ouptut') { |o| @options[:stream] = o }
@@ -41,7 +41,7 @@ class Cli
 
   def check_password(password)
     if password.nil?
-      print 'Enter LDAP Password: '
+      print 'Enter Password: '
       pw = STDIN.noecho(&:gets).chomp
       puts "\n\n"
     else
