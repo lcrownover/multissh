@@ -31,6 +31,13 @@ class Util
     end
   end
 
+  def display_error(error)
+    if @debug
+      puts error.backtrace
+      puts error
+    end
+  end
+
 
   def show_summary(worker)
     if @debug

@@ -12,12 +12,14 @@ require_relative 'lib/util'
 class Multissh < Cli
 
   def run
+    puts "\n\n"
     tasks = []
     @nodes.each do |node|
       worker = Worker.new(
         hostname=node.chomp, 
         username=@username, 
-        password=@password, 
+        password=@password,
+        key_password=@key_password,
         command=@command, 
         stream=@stream, 
         debug=@debug,

@@ -1,12 +1,13 @@
 class Cli
-  attr_accessor :username, :password, :nodes, :command, :stream, :debug
+  attr_accessor :username, :password, :key_password, :nodes, :command, :stream, :debug
 
   def initialize
 
     set_options
     
     @username = @options[:username]
-    @password = check_password(@options[:password])
+    @password = check_password(@options[:password], 'System')
+    @key_password = check_password(@options[:key_password], 'Private Key')
 
     @nodes = parse_nodes(@options[:nodes])
     @command = parse_command(@options[:command])
@@ -24,6 +25,7 @@ class Cli
       opt.banner = 'Usage: multissh.rb --username \'USERNAME\' --nodes "server1,server2" --command "echo \'hello\'"'
       opt.on('--username \'USERNAME\'', 'REQUIRED') { |o| @options[:username] = o }
       opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if not provided') { |o| @options[:password] = o }
+      opt.on('--key_password \'KEYPASSWORD\'', 'OPTIONAL: private key password, will prompt if not provided') { |o| @options[:key_password] = o }
       opt.on('--nodes NODES', 'REQUIRED: "server1,server2,server3" OR "@nodes.txt"') { |o| @options[:nodes] = o }
       opt.on('--command COMMAND', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
       opt.on('--stream', 'OPTIONAL: stream mode for command ouptut') { |o| @options[:stream] = o }
@@ -39,13 +41,13 @@ class Cli
   end#set_options
 
 
-  def check_password(password)
+  def check_password(password, target)
     if password.nil?
-      print 'Enter Password: '
+      print "Enter #{target} Password: "
       pw = STDIN.noecho(&:gets).chomp
-      puts "\n\n"
+      puts "\n"
     else
-      pw = @options[:password]
+      pw = password
     end
     pw
   end#check_password
