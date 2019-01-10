@@ -1,37 +1,39 @@
 require 'net/ssh'
 require 'parallel'
+require 'optparse'
+require 'io/console'
+require 'colorize'
 
 require_relative 'lib/cli'
 require_relative 'lib/worker'
+require_relative 'lib/util'
 
 
-class Multissh
-
-  def initialize
-    cli = Cli.new
-    @username = cli.username
-    @password = cli.password
-    @nodes = cli.nodes
-    @command = cli.command
-    @stream = cli.stream
-    @debug = cli.debug
-  end
-
+class Multissh < Cli
 
   def run
     tasks = []
     @nodes.each do |node|
-      worker = Worker.new(hostname=node, username=@username, password=@password, command=@command, stream=@stream, debug=@debug)
+      worker = Worker.new(
+        hostname=node.chomp, 
+        username=@username, 
+        password=@password, 
+        command=@command, 
+        stream=@stream, 
+        debug=@debug,
+      )
       tasks.append(worker)
     end
 
     results = Parallel.map(tasks) do |task|
-      # puts results
       task.go
     end
 
-  end
-end
+  end#run
+
+end#class
+
+
 
 mssh = Multissh.new
 mssh.run

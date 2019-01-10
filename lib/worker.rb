@@ -1,54 +1,58 @@
 class Worker
-
   def initialize(hostname, username, password, command, stream, debug)
-    @hostname = hostname.chomp
+    @hostname = hostname
     @username = username
     @password = password
     @command = command
     @stream = stream
-    @debug = debug
+
+    @header = "#{hostname} -- "
+    @util = Util.new(debug)
   end
 
 
   def go
+    @util.show_summary(self)
+
     result = ''
     Net::SSH.start(@hostname, @username, :password => @password) do |ssh|
       channel = ssh.open_channel do |channel, success|
+
         channel.on_data do |channel, data|
+
           if data =~ /^\[sudo\] password for /
             channel.send_data "#{@password}\n"
-          else
-            if @stream == true
-              data.split("\r").each do |line|
-                if not line.chomp.empty?
-                  puts "#{@hostname} -- #{line}"
-                end
-              end
-            else
-              result += data.to_s
-            end
           end
+
+          if @stream
+            @util.display_data(@header, data)
+          else
+            result += data.to_s
+          end
+
         end
-        # request a pseudo TTY
-        channel.request_pty
-        # execute command
+
+        # request a pseudo TTY formatted to screen width
+        cols = %x{tput cols}.chomp.to_i - @header.length
+        channel.request_pty(opts={:term=>'xterm',:chars_wide => cols})
         channel.exec(@command)
-        # wait for response
-        channel.wait
+
       end
 
-      # wait for opened channel
       channel.wait
     end
 
-    if @stream == false
-      puts result
+    unless @stream
+      @util.display_data(@header, result)
+      puts "\n"
     end
 
   end
   
+
   def to_s
     "Worker: {hostname:'#{@hostname}',username:'#{@username}',password:'#{@password}',command:'#{@command}',stream:'#{@stream}'"
   end
+
 
 end

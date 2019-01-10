@@ -1,15 +1,17 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    net-ssh (5.0.2)
+    colorize (0.8.1)
+    net-ssh (5.1.0)
     parallel (1.12.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  colorize
   net-ssh
   parallel
 
 BUNDLED WITH
-   1.17.1
+   2.0.1

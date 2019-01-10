@@ -1,6 +1,3 @@
-require 'optparse'
-require 'io/console'
-
 class Cli
   attr_accessor :username, :password, :nodes, :command, :stream, :debug
 
@@ -17,7 +14,7 @@ class Cli
 
     @debug = set_debug(@options[:debug])
 
-  end
+  end#initialize
 
 
   # Do the stuff
@@ -39,7 +36,7 @@ class Cli
       abort(opt_parse.help)
     end
 
-  end
+  end#set_options
 
 
   def check_password(password)
@@ -51,7 +48,7 @@ class Cli
       pw = @options[:password]
     end
     pw
-  end
+  end#check_password
 
 
   # If '@' is used, return a list of nodes from a file
@@ -65,15 +62,15 @@ class Cli
           f.each_line do |line|
             unless line.start_with?('#')
               node_list.append(line)
-            end
-          end
-        end
-      end
+            end#unless
+          end#f.each_line
+        end#File.open
+      end#File.exists?
       node_list
     else
       nodes.split(',').map(&:chomp)
-    end
-  end
+    end#if
+  end#parse_nodes
 
 
   # If '@' is used, return a command string from a file
@@ -87,10 +84,10 @@ class Cli
           f.each_line do |line|
             unless line.start_with?('#')
               command_list.append(line.chomp)
-            end
-          end
-        end
-      end
+            end#unless
+          end#f.each_line
+        end#File.open
+      end#File.exists?
       command_list.map! do |command|
         command = format_command(command)
       end
@@ -98,8 +95,8 @@ class Cli
     else
       command = command.chomp
       command = format_command(command)
-    end
-  end
+    end#if
+  end#parse_command
 
   def format_command(command)
     pre_command = ". ~/.bash_profile; "\
