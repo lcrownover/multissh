@@ -3,7 +3,7 @@ require 'parallel'
 require 'optparse'
 require 'io/console'
 require 'colorize'
-require 'YAML'
+require 'yaml'
 
 require_relative 'lib/cli'
 require_relative 'lib/worker'
