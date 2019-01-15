@@ -12,22 +12,28 @@ cd multissh
 bundle install
 ```
 
+On the first run, you'll be prompted to generate a credential file. 
+This file is stored at *~/.ssh/multissh.yaml*, with the owner as the current user and mode of 600.
+
+If you decline to generate this file, it will prompt for password if not provided via command line.
+
+If you don't have ssh-agent configured with your keys, it will prompt for a private key password during credential file generation, or during run if you opted out of the credential file.
+
+
 <br>
 
 ### Usage
 
 ```
 Usage: multissh.rb --username 'USERNAME' --nodes "server1,server2" --command "echo 'hello'"
-        --username 'USERNAME'        REQUIRED
-        --password 'PASSWORD'        OPTIONAL: will prompt if not provided 
         --nodes NODES                REQUIRED: "server1,server2,server3" OR "@nodes.txt"
         --command COMMAND            REQUIRED: "echo 'hello'" OR @command.txt
-        --stream                     OPTIONAL: stream mode for command ouptut
+        --username 'USERNAME'        OPTIONAL: current user by default
+        --password 'PASSWORD'        OPTIONAL: will prompt if needed
+        --stream                     OPTIONAL: stream mode for command ouptut, default true
+        --generate_credentials       OPTIONAL: regenerate credentials file
         --debug                      OPTIONAL: debug mode
 ```
-
-By default, data is printed to the screen when all the commands have completed. 
-Use the **stream** option to print lines as the data comes in.
 
 *Make sure you enclose command with **double** quotes if not using @ sigil*
 <br><br>

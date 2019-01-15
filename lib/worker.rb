@@ -1,9 +1,10 @@
 class Worker
-  def initialize(hostname, username, password, key_password, command, stream, debug)
+  def initialize(hostname, username, password, pkey_password, sudo_password, command, stream, debug)
     @hostname = hostname
     @username = username
     @password = password
-    @key_password = key_password
+    @pkey_password = pkey_password
+    @sudo_password = sudo_password
     @command = command
     @stream = stream
 
@@ -17,7 +18,7 @@ class Worker
 
     result = ''
     begin
-      Net::SSH.start(@hostname, @username, :password => @password, :passphrase => @key_password) do |ssh|
+      Net::SSH.start(@hostname, @username, :password => @password, :passphrase => @pkey_password) do |ssh|
         channel = ssh.open_channel do |channel, success|
 
           channel.on_data do |channel, data|
@@ -27,10 +28,13 @@ class Worker
             end
 
             if data =~ /^\[sudo\] password for /
-              if @password.nil?
-                channel.send_data "#{@credentials['global']['sudo_password']}"
+              if @sudo_password
+                channel.send_data "#{@sudo_password}\n"
+              elsif @password
+                channel.send_data "#{@password}\n"
+              else
+                raise 'no password or sudo_password defined'
               end
-              channel.send_data "#{@password}\n"
             end
 
             if @stream

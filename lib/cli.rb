@@ -1,21 +1,22 @@
 require_relative 'credential'
 
 class Cli
-  attr_accessor :username, :password, :key_password, :nodes, :command, :stream, :debug
+  attr_accessor :username, :password, :key_password, :nodes, :command, :stream, :debug, :credential
 
   def initialize
 
     set_options
+
     @debug = set_debug(@options[:debug])
-    
-    @username = @options[:username]
-    @password = @options[:password]
 
     if @options[:generate_credentials]
       @regenerate = true
     end
 
-    credential = Credential.new(username=@username, password=@password, regenerate=@regenerate, debug=@debug)
+    credential = Credential.new(username=@options[:username], password=@options[:password], pkey_password=@options[:pkey_password], regenerate=@regenerate, debug=@debug)
+    @username = credential.username
+    @password = credential.password
+    @pkey_password = credential.pkey_password
 
     @nodes = parse_nodes(@options[:nodes])
     @command = parse_command(@options[:command])
@@ -29,11 +30,12 @@ class Cli
     @options = {}
     opt_parse = OptionParser.new do |opt|
       opt.banner = 'Usage: multissh.rb --username \'USERNAME\' --nodes "server1,server2" --command "echo \'hello\'"'
-      opt.on('--username \'USERNAME\'', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
-      opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
       opt.on('--nodes NODES', 'REQUIRED: "server1,server2,server3" OR "@nodes.txt"') { |o| @options[:nodes] = o }
       opt.on('--command COMMAND', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
-      opt.on('--stream', 'OPTIONAL: stream mode for command ouptut, default true') { |o| @options[:stream] = o }
+      opt.on('--username \'USERNAME\'', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
+      opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
+      opt.on('--pkey_password \'PKEY_PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
+      opt.on('--stream \'BOOL\'', 'OPTIONAL: stream mode for command ouptut, default true') { |o| @options[:stream] = o }
       opt.on('--generate_credentials', 'OPTIONAL: regenerate credentials file') { |o| @options[:generate_credentials] = o }
       opt.on('--debug', 'OPTIONAL: debug mode') { |o| @options[:debug] = o }
     end
@@ -106,7 +108,7 @@ class Cli
   end
 
   def set_stream(stream)
-    if stream.nil?
+    if stream.nil? || stream
       true
     else
       false
