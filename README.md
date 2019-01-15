@@ -30,7 +30,8 @@ Usage: multissh.rb --username 'USERNAME' --nodes "server1,server2" --command "ec
         --command COMMAND            REQUIRED: "echo 'hello'" OR @command.txt
         --username 'USERNAME'        OPTIONAL: current user by default
         --password 'PASSWORD'        OPTIONAL: will prompt if needed
-        --stream                     OPTIONAL: stream mode for command ouptut, default true
+        --pkey_password 'PASSWORD'   OPTIONAL: will prompt if needed
+        --stream 'BOOL'              OPTIONAL: stream mode for command ouptut, default true
         --generate_credentials       OPTIONAL: regenerate credentials file
         --debug                      OPTIONAL: debug mode
 ```

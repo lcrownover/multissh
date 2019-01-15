@@ -34,7 +34,7 @@ class Cli
       opt.on('--command COMMAND', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
       opt.on('--username \'USERNAME\'', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
       opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
-      opt.on('--pkey_password \'PKEY_PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
+      opt.on('--pkey_password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
       opt.on('--stream \'BOOL\'', 'OPTIONAL: stream mode for command ouptut, default true') { |o| @options[:stream] = o }
       opt.on('--generate_credentials', 'OPTIONAL: regenerate credentials file') { |o| @options[:generate_credentials] = o }
       opt.on('--debug', 'OPTIONAL: debug mode') { |o| @options[:debug] = o }
