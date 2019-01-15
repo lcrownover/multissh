@@ -13,6 +13,11 @@ class Util
     "#{('-'*80).blue}"
   end
 
+  def dbg(msg)
+    if @debug
+      puts "debug: #{msg}"
+    end
+  end
 
   def display_data(header, data)
     if @debug then puts debug_top(data) end
@@ -43,7 +48,7 @@ class Util
     if @debug
       puts "\n\n#{worker.to_s.blue}\n"
     end
-  end    
+  end   
 
 
 end
