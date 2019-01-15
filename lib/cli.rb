@@ -4,10 +4,20 @@ class Cli
   def initialize
 
     set_options
+
+    @credential_file_path = "#{%x{echo ~}.chomp}/.ssh/multissh.yaml"
     
-    @username = @options[:username]
-    @password = check_password(@options[:password], 'System')
-    @key_password = check_password(@options[:key_password], 'Private Key')
+    @username = check_username(@options[:username])
+
+    if @options[:generate_credentials]
+      generate_credentials
+    end
+
+    @credentials = load_credentials
+
+    @password = check_password(@options[:password])
+
+    @key_password = check_private_key(@options[:key_password])
 
     @nodes = parse_nodes(@options[:nodes])
     @command = parse_command(@options[:command])
@@ -23,34 +33,102 @@ class Cli
     @options = {}
     opt_parse = OptionParser.new do |opt|
       opt.banner = 'Usage: multissh.rb --username \'USERNAME\' --nodes "server1,server2" --command "echo \'hello\'"'
-      opt.on('--username \'USERNAME\'', 'REQUIRED') { |o| @options[:username] = o }
-      opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if not provided') { |o| @options[:password] = o }
-      opt.on('--key_password \'KEYPASSWORD\'', 'OPTIONAL: private key password, will prompt if not provided') { |o| @options[:key_password] = o }
+      opt.on('--username \'USERNAME\'', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
+      opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
+      opt.on('--key_password \'KEYPASSWORD\'', 'OPTIONAL: private key password, will prompt if not using ssh-agent provided') { |o| @options[:key_password] = o }
       opt.on('--nodes NODES', 'REQUIRED: "server1,server2,server3" OR "@nodes.txt"') { |o| @options[:nodes] = o }
       opt.on('--command COMMAND', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
-      opt.on('--stream', 'OPTIONAL: stream mode for command ouptut') { |o| @options[:stream] = o }
+      opt.on('--stream', 'OPTIONAL: stream mode for command ouptut, default true') { |o| @options[:stream] = o }
+      opt.on('--generate_credentials', 'OPTIONAL: regenerate credentials file') { |o| @options[:generate_credentials] = o }
       opt.on('--debug', 'OPTIONAL: debug mode') { |o| @options[:debug] = o }
     end
     opt_parse.parse!
 
+
+
     # Abort the program if required arguments aren't given
-    if (@options[:username].nil? || @options[:nodes].nil? || @options[:command].nil?)
+    if (@options[:nodes].nil? || @options[:command].nil?)
       abort(opt_parse.help)
     end
 
   end#set_options
 
 
-  def check_password(password, target)
+
+  def check_username(username)
+    if username.nil?
+      username = %x{whoami}.chomp.to_s
+    end
+    username
+  end
+
+
+  def check_password(password)
     if password.nil?
-      print "Enter #{target} Password: "
+      if @credentials.nil?
+        print "Enter System Password: "
+        password = STDIN.noecho(&:gets).chomp
+        puts "\n"
+      else
+        password = @credentials['global']['ldap']
+      end
+    end
+    password
+  end
+
+  def check_private_key(password)
+    if ssh_agent_loaded?
+      pw = ''
+    elsif @credentials['global']['pkey']
+      pw = @credentials['global']['pkey']
+    elsif password.nil?
+      print "Enter Private Key Password: "
       pw = STDIN.noecho(&:gets).chomp
       puts "\n"
     else
       pw = password
     end
     pw
-  end#check_password
+  end
+
+  def ssh_agent_loaded?
+    begin
+      Net::SSH::Authentication::Agent.new.connect!
+      true
+    rescue Net::SSH::Authentication::AgentNotAvailable
+      false
+    end
+  end
+
+  def load_credentials
+    begin
+      YAML.load_file(@credential_file_path)
+    rescue
+      puts "\nNo credential file found at #{@credential_file_path}"
+      puts "File will be created with user \"#{@username}\" and mode \"600\"\n\n"
+      generate_credentials
+      YAML.load_file(@credential_file_path)
+    end
+  end
+
+  def generate_credentials
+    print "LDAP Password: "
+    ldap_password = STDIN.noecho(&:gets).chomp
+    puts "\n"
+
+    print "SUDO Password: "
+    sudo_password = STDIN.noecho(&:gets).chomp
+    puts "\n"
+
+    print "Private Key Password: "
+    pkey_password = STDIN.noecho(&:gets).chomp
+    puts "\n"
+
+    yaml = {"global"=>{"sudo"=>sudo_password, "ldap"=>ldap_password, "pkey"=>pkey_password}}
+    File.open(@credential_file_path, 'w') { |f| f.write yaml.to_yaml }
+    %x{chown #{@username} #{@credential_file_path}; chmod 600 #{@credential_file_path} }
+    puts "credentials saved to #{@credential_file_path}"
+  end
 
 
   # If '@' is used, return a list of nodes from a file
@@ -111,9 +189,9 @@ class Cli
 
   def set_stream(stream)
     if stream.nil?
-      false
-    else
       true
+    else
+      false
     end
   end
 

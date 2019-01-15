@@ -22,7 +22,14 @@ class Worker
 
           channel.on_data do |channel, data|
 
+            if data =~ /Sorry, try again/
+              raise 'incorrect sudo password'
+            end
+
             if data =~ /^\[sudo\] password for /
+              if @password.nil?
+                channel.send_data "#{@credentials['global']['sudo_password']}"
+              end
               channel.send_data "#{@password}\n"
             end
 
@@ -53,6 +60,11 @@ class Worker
     rescue SocketError => e
       @util.display_error(e)
       puts "Failed to connect to #{@hostname}\n".red
+
+    rescue RuntimeError => e
+      @util.display_error(e)
+      puts "#{@hostname} -- incorrect sudo password in credential file, failed to connect".red
+
     end
 
   end
