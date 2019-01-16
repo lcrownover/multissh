@@ -25,13 +25,13 @@ If you don't have ssh-agent configured with your keys, it will prompt for a priv
 ### Usage
 
 ```
-Usage: multissh.rb --username 'USERNAME' --nodes "server1,server2" --command "echo 'hello'"
+Usage: multissh.rb --nodes "server1,server2" --command "echo 'hello'"
         --nodes NODES                REQUIRED: "server1,server2,server3" OR "@nodes.txt"
         --command COMMAND            REQUIRED: "echo 'hello'" OR @command.txt
         --username 'USERNAME'        OPTIONAL: current user by default
         --password 'PASSWORD'        OPTIONAL: will prompt if needed
         --pkey_password 'PASSWORD'   OPTIONAL: will prompt if needed
-        --stream 'BOOL'              OPTIONAL: stream mode for command ouptut, default true
+        --stream BOOL                OPTIONAL: stream mode for command ouptut, default true
         --generate_credentials       OPTIONAL: regenerate credentials file
         --debug                      OPTIONAL: debug mode
 ```
@@ -43,7 +43,7 @@ Usage: multissh.rb --username 'USERNAME' --nodes "server1,server2" --command "ec
 
 Run a command against a comma-separated list of nodes
 ```bash
-ruby multissh.rb --username 'USERNAME' --nodes 'NODE1,NODE2' --command "COMMAND"
+ruby multissh.rb --nodes 'NODE1,NODE2' --command "COMMAND"
 ```
 
 <br>
@@ -55,7 +55,7 @@ node2.example.org
 ```
 
 ```bash
-ruby multissh.rb --username 'USERNAME' --nodes @nodes.txt --command "COMMAND"
+ruby multissh.rb --nodes @nodes.txt --command "COMMAND"
 ```
 
 <br>
@@ -68,7 +68,7 @@ ruby -v
 ```
 
 ```bash
-ruby multissh.rb --username 'USERNAME' --nodes @nodes.txt --command @commands.txt
+ruby multissh.rb --nodes @nodes.txt --command @commands.txt
 ```
 
 <br>

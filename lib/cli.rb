@@ -29,13 +29,13 @@ class Cli
   def set_options
     @options = {}
     opt_parse = OptionParser.new do |opt|
-      opt.banner = 'Usage: multissh.rb --username \'USERNAME\' --nodes "server1,server2" --command "echo \'hello\'"'
+      opt.banner = 'Usage: multissh.rb --nodes "server1,server2" --command "echo \'hello\'"'
       opt.on('--nodes NODES', 'REQUIRED: "server1,server2,server3" OR "@nodes.txt"') { |o| @options[:nodes] = o }
       opt.on('--command COMMAND', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
       opt.on('--username \'USERNAME\'', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
       opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
       opt.on('--pkey_password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
-      opt.on('--stream \'BOOL\'', 'OPTIONAL: stream mode for command ouptut, default true') { |o| @options[:stream] = o }
+      opt.on('--stream BOOL', 'OPTIONAL: stream mode for command ouptut, default true') { |o| @options[:stream] = o }
       opt.on('--generate_credentials', 'OPTIONAL: regenerate credentials file') { |o| @options[:generate_credentials] = o }
       opt.on('--debug', 'OPTIONAL: debug mode') { |o| @options[:debug] = o }
     end
