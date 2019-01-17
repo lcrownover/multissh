@@ -1,7 +1,7 @@
 require_relative 'credential'
 
 class Cli
-  attr_accessor :username, :password, :key_password, :nodes, :command, :stream, :debug, :credential
+  attr_accessor :username, :password, :key_password, :nodes, :command, :block, :debug, :credential
 
   def initialize
 
@@ -9,7 +9,7 @@ class Cli
 
     @debug = set_debug(@options[:debug])
 
-    if @options[:generate_credentials]
+    if @options[:regenerate_config]
       @regenerate = true
     end
 
@@ -20,7 +20,7 @@ class Cli
 
     @nodes = parse_nodes(@options[:nodes])
     @command = parse_command(@options[:command])
-    @stream = set_stream(@options[:stream])
+    @block = set_block(@options[:block])
 
   end#initialize
 
@@ -30,21 +30,22 @@ class Cli
     @options = {}
     opt_parse = OptionParser.new do |opt|
       opt.banner = 'Usage: multissh.rb --nodes "server1,server2" --command "echo \'hello\'"'
-      opt.on('--nodes NODES', 'REQUIRED: "server1,server2,server3" OR "@nodes.txt"') { |o| @options[:nodes] = o }
-      opt.on('--command COMMAND', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
-      opt.on('--username \'USERNAME\'', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
-      opt.on('--password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
-      opt.on('--pkey_password \'PASSWORD\'', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
-      opt.on('--stream BOOL', 'OPTIONAL: stream mode for command ouptut, default true') { |o| @options[:stream] = o }
-      opt.on('--generate_credentials', 'OPTIONAL: regenerate credentials file') { |o| @options[:generate_credentials] = o }
-      opt.on('--debug', 'OPTIONAL: debug mode') { |o| @options[:debug] = o }
+      opt.on('--nodes "NODES"', 'REQUIRED: "server1,server2,server3" OR "@nodes.txt"') { |o| @options[:nodes] = o }
+      opt.on('--command "COMMAND"', 'REQUIRED: "echo \'hello\'" OR @command.txt') { |o| @options[:command] = o }
+      opt.on('--username "USERNAME"', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
+      opt.on('--password "PASSWORD"', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
+      opt.on('--pkey_password "PASSWORD"', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
+      opt.on('--block', 'OPTIONAL: block mode for command ouptut') { @options[:block] = true }
+      opt.on('--regenerate_config', 'OPTIONAL: regenerate configuration file') { @options[:regenerate_config] = true }
+      opt.on('--debug', 'OPTIONAL: debug mode') { @options[:debug] = true }
     end
     opt_parse.parse!
 
-
-
-    # Abort the program if required arguments aren't given
-    if (@options[:nodes].nil? || @options[:command].nil?)
+    begin
+      raise OptionParser::MissingArgument if @options[:nodes].nil?
+      raise OptionParser::MissingArgument if @options[:command].nil?
+    rescue
+      puts "\n"
       abort(opt_parse.help)
     end
 
@@ -107,20 +108,12 @@ class Cli
     pre_command + command + ' 2>&1'
   end
 
-  def set_stream(stream)
-    if stream.nil? || stream
-      true
-    else
-      false
-    end
+  def set_block(block)
+    block.nil? ? false : true
   end
 
   def set_debug(debug)
-    if debug.nil?
-      false
-    else
-      true
-    end
+    debug.nil? ? false : true
   end
 
 end

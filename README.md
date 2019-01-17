@@ -32,7 +32,7 @@ Usage: multissh.rb --nodes "server1,server2" --command "echo 'hello'"
         --password 'PASSWORD'        OPTIONAL: will prompt if needed
         --pkey_password 'PASSWORD'   OPTIONAL: will prompt if needed
         --stream BOOL                OPTIONAL: stream mode for command ouptut, default true
-        --generate_credentials       OPTIONAL: regenerate credentials file
+        --regenerate_config       OPTIONAL: regenerate credentials file
         --debug                      OPTIONAL: debug mode
 ```
 

@@ -23,7 +23,7 @@ class Multissh < Cli
         pkey_password=@pkey_password,
         sudo_password=@sudo_password,
         command=@command, 
-        stream=@stream, 
+        block=@block, 
         debug=@debug,
       )
       tasks.append(worker)

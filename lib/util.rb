@@ -50,5 +50,31 @@ class Util
     end
   end   
 
+  def encrypt(s)
+    if s
+      ecarr = []
+      s.chomp.each_byte do |c|
+        (33..126).to_a.include?(c + 20) ? ecarr << (c + 20).chr : ecarr << (c + 20 - 94).chr
+      end
+      ecarr.join
+    else
+      ''
+    end
+  end
+
+
+
+  def decrypt(s)
+    if s
+      carr = []
+      s.chomp.each_byte do |c|
+        (33..126).to_a.include?(c - 20) ? carr << (c - 20).chr : carr << (c - 20 + 94).chr
+      end
+      carr.join
+    else
+      ''
+    end
+  end
+
 
 end

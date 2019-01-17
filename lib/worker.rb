@@ -1,12 +1,12 @@
 class Worker
-  def initialize(hostname, username, password, pkey_password, sudo_password, command, stream, debug)
+  def initialize(hostname, username, password, pkey_password, sudo_password, command, block, debug)
     @hostname = hostname
     @username = username
     @password = password
     @pkey_password = pkey_password
     @sudo_password = sudo_password
     @command = command
-    @stream = stream
+    @block = block
 
     @header = "#{hostname} -- "
     @util = Util.new(debug)
@@ -37,7 +37,7 @@ class Worker
               end
             end
 
-            if @stream
+            unless @block
               @util.display_data(@header, data)
             else
               result += data.to_s
@@ -54,7 +54,7 @@ class Worker
 
         channel.wait
 
-        unless @stream
+        if @block
           @util.display_data(@header, result)
           puts "\n"
         end
@@ -75,7 +75,7 @@ class Worker
   
 
   def to_s
-    "Worker: {hostname:'#{@hostname}',username:'#{@username}',password:'#{@password}',command:'#{@command}',stream:'#{@stream}'"
+    "Worker: {hostname:'#{@hostname}',username:'#{@username}',password:'#{@password}',command:'#{@command}',block:'#{@block}'"
   end
 
 
