@@ -26,13 +26,13 @@ If you don't have ssh-agent configured with your keys, it will prompt for a priv
 
 ```
 Usage: multissh.rb --nodes "server1,server2" --command "echo 'hello'"
-        --nodes NODES                REQUIRED: "server1,server2,server3" OR "@nodes.txt"
-        --command COMMAND            REQUIRED: "echo 'hello'" OR @command.txt
-        --username 'USERNAME'        OPTIONAL: current user by default
-        --password 'PASSWORD'        OPTIONAL: will prompt if needed
-        --pkey_password 'PASSWORD'   OPTIONAL: will prompt if needed
-        --stream BOOL                OPTIONAL: stream mode for command ouptut, default true
-        --regenerate_config       OPTIONAL: regenerate credentials file
+        --nodes "NODES"              REQUIRED: "server1,server2,server3" OR "@nodes.txt"
+        --command "COMMAND"          REQUIRED: "echo 'hello'" OR @command.txt
+        --username "USERNAME"        OPTIONAL: current user by default
+        --password "PASSWORD"        OPTIONAL: will prompt if needed
+        --pkey_password "PASSWORD"   OPTIONAL: will prompt if needed
+        --block                      OPTIONAL: block mode for command ouptut
+        --regenerate_config          OPTIONAL: regenerate configuration file
         --debug                      OPTIONAL: debug mode
 ```
 
