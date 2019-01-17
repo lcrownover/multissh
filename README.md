@@ -36,14 +36,13 @@ Usage: multissh.rb --nodes "server1,server2" --command "echo 'hello'"
         --debug                      OPTIONAL: debug mode
 ```
 
-*Make sure you enclose command with **double** quotes if not using @ sigil*
 <br><br>
 
 ### Examples
 
 Run a command against a comma-separated list of nodes
 ```bash
-ruby multissh.rb --nodes 'NODE1,NODE2' --command "COMMAND"
+ruby multissh.rb --nodes "NODE1,NODE2" --command "COMMAND"
 ```
 
 <br>
