@@ -18,6 +18,10 @@ class Cli
     @password = credential.password
     @pkey_password = credential.pkey_password
 
+    if @options[:regenerate_config]
+      abort()
+    end
+
     @nodes = parse_nodes(@options[:nodes])
     @command = parse_command(@options[:command])
     @block = set_block(@options[:block])
@@ -42,8 +46,10 @@ class Cli
     opt_parse.parse!
 
     begin
-      raise OptionParser::MissingArgument if @options[:nodes].nil?
-      raise OptionParser::MissingArgument if @options[:command].nil?
+      valid_options_set = false
+      valid_options_set = true if @options[:nodes] && @options[:command]
+      valid_options_set = true if @options[:regenerate_config]
+      raise OptionParser::MissingArgument unless valid_options_set
     rescue
       puts "\n"
       abort(opt_parse.help)

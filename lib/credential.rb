@@ -24,19 +24,15 @@ class Credential
   def load_config
     if File.exist? @config_file_path
       @util.dbg('configuration file exists')
-      begin
-        yaml = YAML.load_file(@config_file_path)
-      rescue
-        raise 'Configuration file detected but unable to properly load. Please regenerate using "multissh.rb --regenerate_config"'
-      end
     else
       @util.dbg('couldnt find configuration file')
       generate_config
-      begin
-        yaml = YAML.load_file(@config_file_path)
-      rescue
-        raise 'Configuration file detected but unable to properly load. Please regenerate using "multissh.rb --regenerate_config"'
-      end
+    end
+
+    begin
+      yaml = YAML.load_file(@config_file_path)
+    rescue
+      raise 'Configuration file detected but unable to properly load. Please regenerate using "multissh.rb --regenerate_config"'
     end
 
     if yaml['enabled']
