@@ -13,6 +13,8 @@ class Cli
       @regenerate = true
     end
 
+    @disable_sudo = @options[:disable_sudo]
+
     credential = Credential.new(username=@options[:username], password=@options[:password], pkey_password=@options[:pkey_password], regenerate=@regenerate, debug=@debug)
     @username = credential.username
     @password = credential.password
@@ -25,6 +27,10 @@ class Cli
     @nodes = parse_nodes(@options[:nodes])
     @command = parse_command(@options[:command])
     @block = set_block(@options[:block])
+
+  rescue Interrupt
+    puts "\nCtrl+C Interrupt\n"
+    exit 1
 
   end#initialize
 
@@ -39,6 +45,7 @@ class Cli
       opt.on('--username "USERNAME"', 'OPTIONAL: current user by default') { |o| @options[:username] = o }
       opt.on('--password "PASSWORD"', 'OPTIONAL: will prompt if needed') { |o| @options[:password] = o }
       opt.on('--pkey_password "PASSWORD"', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
+      opt.on('--disable_sudo', 'OPTIONAL: disable_sudo requirement and run as current user') { @options[:disable_sudo] = true }
       opt.on('--block', 'OPTIONAL: block mode for command ouptut') { @options[:block] = true }
       opt.on('--regenerate_config', 'OPTIONAL: regenerate configuration file') { @options[:regenerate_config] = true }
       opt.on('--debug', 'OPTIONAL: debug mode') { @options[:debug] = true }
@@ -68,7 +75,7 @@ class Cli
       if File.exists? expanded_file_path
         File.open(expanded_file_path, 'r') do |f|
           f.each_line do |line|
-            line.chomp!
+            line.chomp!.strip!
             unless line.start_with?('#') || line.empty?
               node_list.append(line)
             end#unless
@@ -92,7 +99,7 @@ class Cli
       if File.exists? expanded_file_path
         File.open(expanded_file_path, 'r') do |f|
           f.each_line do |line|
-            line.chomp!
+            line.chomp!.strip!
             unless line.start_with?('#') || line.empty?
               command_list.append(line)
             end#unless
@@ -100,20 +107,22 @@ class Cli
         end#File.open
       end#File.exists?
       command_list.map! do |command|
-        command = format_command(command)
+        command = format_command(command, @disable_sudo)
       end
       command = command_list.join('; ')
     else
       command = command.chomp
-      command = format_command(command)
+      command = format_command(command, @disable_sudo)
     end#if
   end#parse_command
 
-  def format_command(command)
+  def format_command(command, disable_sudo=false)
     pre_command = ". ~/.bash_profile; "\
                   "export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin; "
     unless command[0..3] == 'sudo'
-      command = 'sudo ' + command
+      unless disable_sudo
+        command = 'sudo ' + command
+      end
     end
     pre_command + command + ' 2>&1'
   end

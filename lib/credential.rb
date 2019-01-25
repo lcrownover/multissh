@@ -7,7 +7,7 @@ class Credential
 
     @config_file_path = "#{%x{echo ~}.chomp}/.ssh/multissh.yaml"
     @username = set_username(username)
-    @password = password
+    @password = set_password(password)
     @pkey_password = pkey_password
     @sudo_password = nil
     @snowflakes = nil
@@ -77,6 +77,16 @@ class Credential
       @username = username
     else
       @username = %x{whoami}.chomp.to_s
+    end
+  end
+
+  def set_password(password)
+    if password == ""
+      printf "Enter System Password: "
+      password = STDIN.noecho(&:gets).chomp
+      password
+    else
+      password
     end
   end
 

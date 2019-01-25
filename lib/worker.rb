@@ -23,18 +23,30 @@ class Worker
 
           channel.on_data do |channel, data|
 
-            if data =~ /Sorry, try again/
-              raise 'incorrect sudo password'
+            attempts = 0
+
+            if attempts >= 2
+              raise 'failed to connect -- too many attempts'
             end
 
-            if data =~ /^\[sudo\] password for /
+            if data =~ /Sorry, try again/
+              raise 'failed to connect -- incorrect sudo password'
+            end
+
+            if data =~ /^\[sudo\] password for / and attempts == 0
               if @sudo_password
                 channel.send_data "#{@sudo_password}\n"
               elsif @password
                 channel.send_data "#{@password}\n"
               else
-                raise 'no password or sudo_password defined'
+                raise 'failed to connect -- no sudo_password or password defined'
               end
+              attempts += 1
+              @util.dbg("attempts: #{attempts}")
+            elsif data =~ /^\[sudo\] password for / and attempts == 1
+              channel.send_data "#{@password}\n"
+              attempts += 1
+              @util.dbg("attempts: #{attempts}")
             end
 
             unless @block
@@ -67,7 +79,7 @@ class Worker
 
     rescue RuntimeError => e
       @util.display_error(e)
-      puts "#{@hostname} -- incorrect sudo password in credential file, failed to connect".red
+      puts "#{@hostname} -- incorrect password, failed to connect".red
 
     end
 

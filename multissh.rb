@@ -33,6 +33,10 @@ class Multissh < Cli
       task.go
     end
 
+    rescue Interrupt
+      puts "\nCtrl+C Interrupt\n"
+      exit 1
+
   end#run
 
 end#class
