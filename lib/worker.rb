@@ -21,6 +21,11 @@ class Worker
       Net::SSH.start(@hostname, @username, :password => @password, :passphrase => @pkey_password) do |ssh|
         channel = ssh.open_channel do |channel, success|
 
+          # request a pseudo TTY formatted to screen width
+          cols = %x{tput cols}.chomp.to_i - @header.length
+          channel.request_pty(opts={:term=>'xterm',:chars_wide => cols})
+          channel.exec(@command)
+
           channel.on_data do |channel, data|
 
             attempts = 0
@@ -56,11 +61,6 @@ class Worker
             end
 
           end
-
-          # request a pseudo TTY formatted to screen width
-          cols = %x{tput cols}.chomp.to_i - @header.length
-          channel.request_pty(opts={:term=>'xterm',:chars_wide => cols})
-          channel.exec(@command)
 
         end
 
