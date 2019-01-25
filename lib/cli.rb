@@ -16,7 +16,7 @@ class Cli
     credential = Credential.new(username=@options[:username], password=@options[:password], pkey_password=@options[:pkey_password], regenerate=@regenerate, debug=@debug)
     @username = credential.username
     @password = credential.password
-    @pkey_password = credential.pkey_password
+    @pkey_password = if credential.pkey_password == "" then nil else credential.pkey_password end
 
     if @options[:regenerate_config]
       abort()
@@ -68,7 +68,8 @@ class Cli
       if File.exists? expanded_file_path
         File.open(expanded_file_path, 'r') do |f|
           f.each_line do |line|
-            unless line.start_with?('#')
+            line.chomp!
+            unless line.start_with?('#') || line.empty?
               node_list.append(line)
             end#unless
           end#f.each_line
@@ -91,8 +92,9 @@ class Cli
       if File.exists? expanded_file_path
         File.open(expanded_file_path, 'r') do |f|
           f.each_line do |line|
-            unless line.start_with?('#')
-              command_list.append(line.chomp)
+            line.chomp!
+            unless line.start_with?('#') || line.empty?
+              command_list.append(line)
             end#unless
           end#f.each_line
         end#File.open

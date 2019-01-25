@@ -143,6 +143,7 @@ class Credential
 
   def ssh_agent_loaded?
     begin
+      @util.dbg('ssh-agent begin check')
       Net::SSH::Authentication::Agent.new.connect!
       @util.dbg('ssh-agent loaded')
       true
