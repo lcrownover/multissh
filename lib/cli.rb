@@ -64,8 +64,9 @@ class Cli
     if nodes.start_with?('@')
       node_list = []
       file_path = nodes[1..-1]
-      if File.exists? File.expand_path(file_path)
-        File.open(nodes[1..-1], 'r') do |f|
+      expanded_file_path = File.expand_path(file_path)
+      if File.exists? expanded_file_path
+        File.open(expanded_file_path, 'r') do |f|
           f.each_line do |line|
             unless line.start_with?('#')
               node_list.append(line)
@@ -86,8 +87,9 @@ class Cli
     if command.start_with?('@')
       command_list = []
       file_path = command[1..-1]
-      if File.exists? File.expand_path(file_path)
-        File.open(command[1..-1], 'r') do |f|
+      expanded_file_path = File.expand_path(file_path)
+      if File.exists? expanded_file_path
+        File.open(expanded_file_path, 'r') do |f|
           f.each_line do |line|
             unless line.start_with?('#')
               command_list.append(line.chomp)
