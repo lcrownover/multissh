@@ -84,7 +84,7 @@ class Cli
       end#File.exists?
       node_list
     else
-      nodes.split(',').map(&:chomp)
+      nodes.split(',').map(&:strip)
     end#if
   end#parse_nodes
 
