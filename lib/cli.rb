@@ -68,7 +68,7 @@ class Cli
     # If '@' is used, return a list of nodes from a file
     # Otherwise return a list of nodes parsed from comma-separated input from cli
     #
-    @util.dbg("nodes: #{nodes}")
+    @util.dbg("input nodes: #{nodes}")
     if nodes.start_with?('@')
       node_list = []
       file_path = nodes[1..-1]
@@ -76,13 +76,13 @@ class Cli
       @util.dbg("nodes_file: #{expanded_file_path}")
       raise "File not found" unless File.exists?(expanded_file_path)
 
-      File.open(expanded_file_path, 'r') do |f|
-        f.each_line do |line|
-          @util.dbg("line: #{line}")
-          line.chomp!.strip!
-          unless line.start_with?('#') || line.empty?
-            node_list << line
-          end
+      node_file = File.open(expanded_file_path).read
+      node_file.each_line do |line|
+        @util.dbg("raw node: #{line}")
+        line.chomp!.strip!
+        unless line.start_with?('#') || line.empty?
+          @util.dbg("valid node: #{line}")
+          node_list << line
         end
       end
 
@@ -98,7 +98,7 @@ class Cli
     # If '@' is used, return a command string from a file
     # Otherwise return specified command
     #
-    @util.dbg("command: #{command}")
+    @util.dbg("input command: #{command}")
     if command.start_with?('@')
       command_list = []
       file_path = command[1..-1]
@@ -106,12 +106,13 @@ class Cli
       @util.dbg("command_file: #{expanded_file_path}")
       raise "File not found" unless File.exists?(expanded_file_path)
 
-      File.open(expanded_file_path, 'r') do |f|
-        f.each_line do |line|
-          line.chomp!.strip!
-          unless line.start_with?('#') || line.empty?
-            command_list << line
-          end
+      command_file = File.open(expanded_file_path).read
+      command_file.each_line do |line|
+        @util.dbg("raw command: #{line}")
+        line.chomp!.strip!
+        unless line.start_with?('#') || line.empty?
+          @util.dbg("valid command: #{line}")
+          command_list << line
         end
       end
 
