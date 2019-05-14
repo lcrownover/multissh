@@ -27,7 +27,6 @@ class Cli
 
       raise OptionParser::MissingArgument unless valid_options_set
     rescue
-      puts "\n"
       abort(opt_parse.help)
     end
 

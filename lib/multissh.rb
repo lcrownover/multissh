@@ -5,7 +5,6 @@ require 'io/console'
 require 'colorize'
 require 'yaml'
 
-require_relative 'update'
 require_relative 'cli'
 require_relative 'worker'
 require_relative 'util'
