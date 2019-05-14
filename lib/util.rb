@@ -15,7 +15,7 @@ class Util
 
   def dbg(msg)
     if @debug
-      puts "debug: #{msg}"
+      puts "debug: #{msg}".blue
     end
   end
 
@@ -29,6 +29,12 @@ class Util
     if @debug then puts debug_bottom end
   end
 
+  def check_affirmative
+    ans = ['y', 'yes', ''].include?(gets.chomp) ? true : false
+    dbg("affirmative = #{ans}")
+    puts "\n"
+    return ans
+  end
 
   def format_line(header, line)
     if not line.chomp.empty?

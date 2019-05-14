@@ -14,11 +14,11 @@ class Credential
     @regenerate       = true if regenerate
 
     generate_config if @regenerate
-    load_config
+    process_config
   end
 
 
-  def load_config
+  def process_config
     if File.exist? @config_file_path
       @util.dbg('configuration file exists')
     else
@@ -27,27 +27,37 @@ class Credential
     end
 
     begin
-      yaml = YAML.load_file(@config_file_path)
+      @yaml = YAML.load_file(@config_file_path)
     rescue
       raise 'Configuration file detected but unable to properly load. Please regenerate using "multissh.rb --regenerate_config"'
     end
 
-    if yaml['enabled']
+    if @yaml['enabled']
       @util.dbg('credential enabled')
-      @util.dbg(yaml)
-      unless @password 
-        @password = @util.decrypt(yaml['credentials']['password'])
+      @util.dbg(@yaml)
+
+      unless @yaml['credentials'][@username]
+        printf "No saved credential for #{@username}, create one? [yes]: "
+        if @util.check_affirmative
+          credential = generate_credential_entry
+          @yaml['credentials'][@username] = credential
+          save_config
+          load_config
+        end
+      end
+
+      unless @password
+        @password = @util.decrypt(@yaml['credentials'][@username]['password'])
         @util.dbg("password - #{@password}")
       end
+
       unless @pkey_password
-        @pkey_password = @util.decrypt(yaml['credentials']['pkey_password'])
+        @pkey_password = @util.decrypt(@yaml['credentials'][@username]['pkey_password'])
         @util.dbg("pkey_password - #{@pkey_password}")
       end
-      @sudo_password = @util.decrypt(yaml['credentials']['sudo_password'])
-      @util.dbg("sudo_password - #{@sudo_password}")
 
-      @snowflakes = yaml['snowflakes']
-      @util.dbg("snowflakes - #{@snowflakes}")
+      @sudo_password = @util.decrypt(@yaml['credentials'][@username]['sudo_password'])
+      @util.dbg("sudo_password - #{@sudo_password}")
 
     else
       @util.dbg('credential disabled')
@@ -106,44 +116,25 @@ class Credential
         printf "Please answer only with 'y' or 'n': "
         ans = gets.chomp.downcase
       end
-      if ans == 'y'
-        generate = true
-      else
-        generate = false
-      end
+      generate = (ans == 'y') ? true : false
+
     else
       generate = true
       puts 'MultiSSH called with "--regenerate_config", generating new configuration file'
     end
 
     if generate
-      print "Password: "
-      password = STDIN.noecho(&:gets).chomp
-      epassword = @util.encrypt(password)
-      puts "\n"
-
-      unless ssh_agent_loaded?
-        pkey_password = nil
-        if private_key_exist?
-          print "Private Key Password: "
-          pkey_password = STDIN.noecho(&:gets).chomp
-          epkey_password = @util.encrypt(pkey_password)
-          puts "\n"
-        end
-      end
-
-      yaml = {"enabled"=>true,"credentials"=>{"password"=>epassword, "pkey_password"=>epkey_password}}
-
+      credential = generate_credential_entry
+      @yaml = { "enabled" => true, "credentials" => { @username => credential } }
     else
-      yaml = {"enabled"=>false}
-
+      @yaml = { "enabled" => false }
     end
 
-    File.open(@config_file_path, 'w') { |f| f.write yaml.to_yaml }
+    save_config
     set_secure_permissions
-    unless generate
-      puts "configuration file set to disabled"
-    end
+
+    unless generate then puts "configuration file set to disabled" end
+
     puts "Configuration file saved to #{@config_file_path}".yellow
     @util.dbg('end generation process')
   end
@@ -168,6 +159,40 @@ class Credential
       true
     end
   end
+
+  def generate_credential_entry
+    @util.dbg("generating new entry for #{@username}")
+    print "#{@username} - Password: "
+    password = STDIN.noecho(&:gets).chomp
+    epassword = @util.encrypt(password)
+    puts "\n"
+
+    unless ssh_agent_loaded?
+      pkey_password = nil
+      if private_key_exist?
+        print "#{@username} - SSH Private Key Password: "
+        pkey_password = STDIN.noecho(&:gets).chomp
+        epkey_password = @util.encrypt(pkey_password)
+        puts "\n"
+      end
+    end
+
+    credential = { "password" => epassword, "pkey_password" => epkey_password }
+    @util.dbg("credential:")
+    @util.dbg(credential)
+    return credential
+  end
+
+  def save_config
+    @util.dbg("saving config to '#{@config_file_path}'")
+    File.open(@config_file_path, 'w') { |f| f.write @yaml.to_yaml }
+  end
+
+  def load_config
+    @util.dbg("loading config from '#{@config_file_path}'")
+    @yaml = YAML.load_file(@config_file_path)
+  end
+
 
   def set_secure_permissions
     %x{chown #{@username} #{@config_file_path}; chmod 600 #{@config_file_path} }

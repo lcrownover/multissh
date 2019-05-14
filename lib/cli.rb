@@ -31,16 +31,20 @@ class Cli
       abort(opt_parse.help)
     end
 
+    @username       = @options[:username]
+    @password       = @options[:password]
+    @pkey_password  = @options[:pkey_password]
+
     @debug          = true if @options[:debug]
     @regenerate     = true if @options[:regenerate_config]
     @disable_sudo   = true if @options[:disable_sudo]
 
     credential      = Credential.new(
-                      username=@options[:username], 
-                      password=@options[:password], 
-                      pkey_password=@options[:pkey_password], 
-                      regenerate=@regenerate, 
-                      debug=@debug
+                      username      = @username, 
+                      password      = @password, 
+                      pkey_password = @pkey_password, 
+                      regenerate    = @regenerate, 
+                      debug         = @debug
                     )
     @username       = credential.username
     @password       = credential.password
@@ -51,8 +55,6 @@ class Cli
     @nodes          = parse_nodes(@options[:nodes])
     @command        = parse_command(@options[:command])
     @block          = true if @options[:block]
-
-    puts "\n"
 
   rescue Interrupt
     puts "\nCtrl+C Interrupt\n"

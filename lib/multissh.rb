@@ -14,7 +14,6 @@ require_relative 'util'
 class Multissh < Cli
 
   def run
-    puts "\n\n"
     tasks = []
     @nodes.each do |node|
       worker = Worker.new(

@@ -1,15 +1,15 @@
 class Worker
   def initialize(hostname, username, password, pkey_password, sudo_password, command, block, debug)
-    @hostname = hostname
-    @username = username
-    @password = password
-    @pkey_password = pkey_password
-    @sudo_password = sudo_password
-    @command = command
-    @block = block
+    @hostname       = hostname
+    @username       = username
+    @password       = password
+    @pkey_password  = pkey_password
+    @sudo_password  = sudo_password
+    @command        = command
+    @block          = block
 
-    @header = "#{hostname} -- "
-    @util = Util.new(debug)
+    @header         = "#{hostname} -- "
+    @util           = Util.new(debug)
   end
 
 
@@ -18,12 +18,14 @@ class Worker
 
     result = ''
     begin
-      Net::SSH.start(@hostname, @username, :password => @password, :passphrase => @pkey_password) do |ssh|
+      Net::SSH.start(@hostname, @username, :password => @password, :passphrase => @pkey_password, :non_interactive => true) do |ssh|
         channel = ssh.open_channel do |channel, success|
 
           # request a pseudo TTY formatted to screen width
           cols = %x{tput cols}.chomp.to_i - @header.length
           channel.request_pty(opts={:term=>'xterm',:chars_wide => cols})
+
+          @util.dbg("sending command: #{@command}")
           channel.exec(@command)
 
           channel.on_data do |channel, data|
@@ -36,6 +38,10 @@ class Worker
 
             if data =~ /Sorry, try again/
               raise 'failed to connect -- incorrect sudo password'
+            end
+
+            if data =~ /#{@username}@#{@hostname}'s password:/
+              raise 'failed to connect -- password failed'
             end
 
             if data =~ /^\[sudo\] password for / and attempts == 0
