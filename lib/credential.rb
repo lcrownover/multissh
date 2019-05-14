@@ -2,22 +2,19 @@ class Credential
   attr_accessor :config_file_path, :username, :password, :pkey_password, :sudo_password, :snowflakes, :auto_update
 
   def initialize(username, password, pkey_password, regenerate, debug)
-    @debug = debug
-    @util = Util.new(@debug)
+    @debug            = debug
+    @util             = Util.new(@debug)
 
     @config_file_path = "#{%x{echo ~}.chomp}/.ssh/multissh.yaml"
-    @username = set_username(username)
-    @password = set_password(password)
-    @pkey_password = pkey_password
-    @sudo_password = nil
-    @snowflakes = nil
-    @auto_update = nil
+    @username         = set_username(username)
+    @password         = set_password(password)
+    @pkey_password    = pkey_password
+    @sudo_password    = nil
+    @snowflakes       = nil
+    @auto_update      = nil
+    @regenerate       = true if regenerate
 
-    if regenerate
-      @regenerate = true
-      generate_config
-    end
-
+    generate_config if @regenerate
     load_config
   end
 

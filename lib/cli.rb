@@ -5,39 +5,6 @@ class Cli
 
   def initialize
 
-    set_options
-
-    @debug = set_debug(@options[:debug])
-
-    if @options[:regenerate_config]
-      @regenerate = true
-    end
-
-    @disable_sudo = @options[:disable_sudo]
-
-    credential = Credential.new(username=@options[:username], password=@options[:password], pkey_password=@options[:pkey_password], regenerate=@regenerate, debug=@debug)
-    @username = credential.username
-    @password = credential.password
-    @pkey_password = if credential.pkey_password == "" then nil else credential.pkey_password end
-    @auto_update = credential.auto_update
-
-    if @options[:regenerate_config]
-      abort()
-    end
-
-    @nodes = parse_nodes(@options[:nodes])
-    @command = parse_command(@options[:command])
-    @block = set_block(@options[:block])
-
-  rescue Interrupt
-    puts "\nCtrl+C Interrupt\n"
-    exit 1
-
-  end#initialize
-
-
-  # Do the stuff
-  def set_options
     @options = {}
     opt_parse = OptionParser.new do |opt|
       opt.banner = 'Usage: multissh.rb --nodes "server1,server2" --command "echo \'hello\'"'
@@ -57,18 +24,50 @@ class Cli
       valid_options_set = false
       valid_options_set = true if @options[:nodes] && @options[:command]
       valid_options_set = true if @options[:regenerate_config]
+
       raise OptionParser::MissingArgument unless valid_options_set
     rescue
       puts "\n"
       abort(opt_parse.help)
     end
 
-  end#set_options
+    @debug          = true if @options[:debug]
+    @regenerate     = true if @options[:regenerate_config]
+    @disable_sudo   = true if @options[:disable_sudo]
+
+    credential      = Credential.new(
+                      username=@options[:username], 
+                      password=@options[:password], 
+                      pkey_password=@options[:pkey_password], 
+                      regenerate=@regenerate, 
+                      debug=@debug
+                    )
+    @username       = credential.username
+    @password       = credential.password
+    @pkey_password  = if credential.pkey_password == "" then nil else credential.pkey_password end
+    @auto_update    = credential.auto_update
+
+    abort() if @options[:regenerate_config]
+
+    @nodes          = parse_nodes(@options[:nodes])
+    @command        = parse_command(@options[:command])
+    @block          = true if @options[:block]
+
+    puts "\n"
+
+  rescue Interrupt
+    puts "\nCtrl+C Interrupt\n"
+    exit 1
+
+  end#initialize
 
 
-  # If '@' is used, return a list of nodes from a file
-  # Otherwise return a list of nodes parsed from comma-separated input from cli
+
   def parse_nodes(nodes)
+    ##
+    # If '@' is used, return a list of nodes from a file
+    # Otherwise return a list of nodes parsed from comma-separated input from cli
+    #
     if nodes.start_with?('@')
       node_list = []
       file_path = nodes[1..-1]
@@ -90,9 +89,11 @@ class Cli
   end#parse_nodes
 
 
-  # If '@' is used, return a command string from a file
-  # Otherwise return specified command
   def parse_command(command)
+    ##
+    # If '@' is used, return a command string from a file
+    # Otherwise return specified command
+    #
     if command.start_with?('@')
       command_list = []
       file_path = command[1..-1]
@@ -117,6 +118,7 @@ class Cli
     end#if
   end#parse_command
 
+
   def format_command(command, disable_sudo=false)
     pre_command = ". ~/.bash_profile; "\
                   "export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin; "
@@ -126,14 +128,6 @@ class Cli
       end
     end
     pre_command + command + ' 2>&1'
-  end
-
-  def set_block(block)
-    block.nil? ? false : true
-  end
-
-  def set_debug(debug)
-    debug.nil? ? false : true
   end
 
 end

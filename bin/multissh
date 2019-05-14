@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'multissh'
+
+mssh = Multissh.new
+mssh.run
+
