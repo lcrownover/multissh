@@ -1,5 +1,5 @@
 class Credential
-  attr_accessor :config_file_path, :username, :password, :pkey_password, :sudo_password, :snowflakes
+  attr_accessor :config_file_path, :username, :password, :pkey_password, :sudo_password, :snowflakes, :auto_update
 
   def initialize(username, password, pkey_password, regenerate, debug)
     @debug = debug
@@ -11,6 +11,7 @@ class Credential
     @pkey_password = pkey_password
     @sudo_password = nil
     @snowflakes = nil
+    @auto_update = nil
 
     if regenerate
       @regenerate = true
@@ -51,6 +52,9 @@ class Credential
 
       @snowflakes = yaml['snowflakes']
       @util.dbg("snowflakes - #{@snowflakes}")
+
+      @auto_update = yaml['auto_update']
+      @util.dbg("auto_update - #{@auto_update}")
 
     else
       @util.dbg('credential disabled')
@@ -134,10 +138,14 @@ class Credential
           puts "\n"
         end
       end
-      yaml = {"enabled"=>true,"credentials"=>{"password"=>epassword, "pkey_password"=>epkey_password}}
+
+      printf "Would you like to enable auto updates? [no]: "
+      auto_update = ['yes', 'y', 'Y'].include? get.chomp ? true : false
+
+      yaml = {"enabled"=>true,"auto_update"=>auto_update,"credentials"=>{"password"=>epassword, "pkey_password"=>epkey_password}}
 
     else
-      yaml = {"enabled"=>false}
+      yaml = {"enabled"=>false,"auto_update"=>false}
 
     end
 

@@ -81,6 +81,9 @@ class Worker
       @util.display_error(e)
       puts "#{@hostname} -- incorrect password, failed to connect".red
 
+    rescue => e
+      @util.display_error(e)
+
     end
 
   end

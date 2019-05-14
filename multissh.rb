@@ -5,6 +5,7 @@ require 'io/console'
 require 'colorize'
 require 'yaml'
 
+require_relative 'lib/update'
 require_relative 'lib/cli'
 require_relative 'lib/worker'
 require_relative 'lib/util'
@@ -41,7 +42,13 @@ class Multissh < Cli
 
 end#class
 
+command_list = ['ruby', "#{$0}"]
+ARGV.each { |arg| command_list << arg }
+called_command = command_list.join(' ')
 
+
+# update = Update.new(called_command)
+# update.update(called_command)
 
 mssh = Multissh.new
 mssh.run
