@@ -6,6 +6,7 @@ Gem::Specification.new do |spec|
   spec.description = "Quickly run multiple commands on many boxes at the same time"
   spec.authors     = ["Lucas Crownover"]
   spec.email       = 'lcrownover127@gmail.com'
+  spec.homepage    = 'https://www.savethemanatee.org/manatees/facts/'
   spec.files       = `git ls-files`.split($\)
   spec.executables = ["multissh"]
   spec.require_paths = ["lib"]
