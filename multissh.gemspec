@@ -1,6 +1,5 @@
 Gem::Specification.new do |spec|
-  spec.owner       = ["lcrownover127@gmail.com"]
-  spec.name        = 'multissh'
+  spec.name        = 'uoregon-multissh'
   spec.version     = '0.2.2'
   spec.date        = '2019-05-14'
   spec.summary     = "Do all the things everywhere at the same time"
