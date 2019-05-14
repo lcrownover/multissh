@@ -137,7 +137,7 @@ class Credential
       end
 
       printf "Would you like to enable auto updates? [no]: "
-      auto_update = ['yes', 'y', 'Y'].include? get.chomp ? true : false
+      auto_update = ['yes', 'y', 'Y'].include? gets.chomp ? true : false
 
       yaml = {"enabled"=>true,"auto_update"=>auto_update,"credentials"=>{"password"=>epassword, "pkey_password"=>epkey_password}}
 
