@@ -62,7 +62,6 @@ class Cli
   end#initialize
 
 
-
   def parse_nodes(nodes)
     ##
     # If '@' is used, return a list of nodes from a file
@@ -82,9 +81,9 @@ class Cli
           end#f.each_line
         end#File.open
       end#File.exists?
-      node_list
+      return node_list
     else
-      nodes.split(',').map(&:strip)
+      return nodes.split(',').map(&:strip)
     end#if
   end#parse_nodes
 
