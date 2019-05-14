@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name        = 'uoregon-multissh'
-  spec.version     = '0.3.4'
+  spec.version     = '0.3.5'
   spec.date        = '2019-05-14'
   spec.summary     = "Do all the things everywhere at the same time"
   spec.description = "Quickly run multiple commands on many boxes at the same time"
