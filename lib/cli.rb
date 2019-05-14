@@ -35,6 +35,7 @@ class Cli
     @pkey_password  = @options[:pkey_password]
 
     @debug          = true if @options[:debug]
+    @util           = Util.new(@debug)
     @regenerate     = true if @options[:regenerate_config]
     @disable_sudo   = true if @options[:disable_sudo]
 
@@ -67,20 +68,23 @@ class Cli
     # If '@' is used, return a list of nodes from a file
     # Otherwise return a list of nodes parsed from comma-separated input from cli
     #
+    @util.dbg("nodes: #{nodes}")
     if nodes.start_with?('@')
       node_list = []
       file_path = nodes[1..-1]
       expanded_file_path = File.expand_path(file_path)
-      if File.exists? expanded_file_path
-        File.open(expanded_file_path, 'r') do |f|
-          f.each_line do |line|
-            line.chomp!.strip!
-            unless line.start_with?('#') || line.empty?
-              node_list.append(line)
-            end#unless
-          end#f.each_line
-        end#File.open
-      end#File.exists?
+      @util.dbg("nodes_file: #{expanded_file_path}")
+      raise "File not found" unless File.exists?(expanded_file_path)
+
+      File.open(expanded_file_path, 'r') do |f|
+        f.each_line do |line|
+          line.chomp!.strip!
+          unless line.start_with?('#') || line.empty?
+            node_list << line
+          end
+        end
+      end
+
       return node_list
     else
       return nodes.split(',').map(&:strip)
@@ -93,20 +97,23 @@ class Cli
     # If '@' is used, return a command string from a file
     # Otherwise return specified command
     #
+    @util.dbg("command: #{command}")
     if command.start_with?('@')
       command_list = []
       file_path = command[1..-1]
       expanded_file_path = File.expand_path(file_path)
-      if File.exists? expanded_file_path
-        File.open(expanded_file_path, 'r') do |f|
-          f.each_line do |line|
-            line.chomp!.strip!
-            unless line.start_with?('#') || line.empty?
-              command_list.append(line)
-            end#unless
-          end#f.each_line
-        end#File.open
-      end#File.exists?
+      @util.dbg("command_file: #{expanded_file_path}")
+      raise "File not found" unless File.exists?(expanded_file_path)
+
+      File.open(expanded_file_path, 'r') do |f|
+        f.each_line do |line|
+          line.chomp!.strip!
+          unless line.start_with?('#') || line.empty?
+            command_list << line
+          end
+        end
+      end
+
       command_list.map! do |command|
         command = format_command(command, @disable_sudo)
       end
