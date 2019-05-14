@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Lucas Crownover"]
   spec.email       = 'lcrownover127@gmail.com'
   spec.homepage    = 'https://www.savethemanatee.org/manatees/facts/'
-  spec.files       = `git ls-files`.split($\)
+  spec.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/} || f.match(%r{^multissh.*\.gem$})) }
   spec.executables = ["multissh"]
   spec.require_paths = ["lib"]
   spec.license     = 'MIT'
