@@ -3,7 +3,13 @@
 Do all the things everywhere at the same time
 
 
-### Setup
+### Installation (gem)
+
+```
+gem install uoregon-multissh
+```
+
+### Installation (github)
 
 Clone the repo and install the required gems with bundler
 ```
@@ -11,6 +17,9 @@ git clone https://github.com/lcrownover/multissh
 cd multissh
 bundle install
 ```
+
+
+### Configuration
 
 On the first run, you'll be prompted to generate a credential file. 
 This file is stored at *~/.ssh/multissh.yaml*, with the owner as the current user and mode of 600.
