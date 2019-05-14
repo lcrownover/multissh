@@ -78,6 +78,7 @@ class Cli
 
       File.open(expanded_file_path, 'r') do |f|
         f.each_line do |line|
+          @util.dbg("line: #{line}")
           line.chomp!.strip!
           unless line.start_with?('#') || line.empty?
             node_list << line
