@@ -1,4 +1,5 @@
 Gem::Specification.new do |spec|
+  spec.owner       = ["lcrownover127@gmail.com"]
   spec.name        = 'multissh'
   spec.version     = '0.2.2'
   spec.date        = '2019-05-14'
