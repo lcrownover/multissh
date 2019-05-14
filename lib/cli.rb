@@ -45,7 +45,6 @@ class Cli
     @username       = credential.username
     @password       = credential.password
     @pkey_password  = if credential.pkey_password == "" then nil else credential.pkey_password end
-    @auto_update    = credential.auto_update
 
     abort() if @options[:regenerate_config]
 

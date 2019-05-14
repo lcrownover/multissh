@@ -42,10 +42,3 @@ class Multissh < Cli
 
 end#class
 
-# command_list = ['ruby', "#{$0}"]
-# ARGV.each { |arg| command_list << arg }
-# called_command = command_list.join(' ')
-
-# update = Update.new(called_command)
-# update.update(called_command)
-
