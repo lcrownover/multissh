@@ -1,7 +1,7 @@
 require_relative 'credential'
 
 class Cli
-  attr_accessor :username, :password, :key_password, :nodes, :command, :block, :debug, :credential
+  attr_accessor :username, :password, :key_password, :nodes, :command, :block, :header_max_length, :debug, :credential
 
   def initialize
 
@@ -15,6 +15,7 @@ class Cli
       opt.on('--pkey_password "PASSWORD"', 'OPTIONAL: will prompt if needed') { |o| @options[:pkey_password] = o }
       opt.on('--disable_sudo', 'OPTIONAL: disable_sudo requirement and run as current user') { @options[:disable_sudo] = true }
       opt.on('--block', 'OPTIONAL: block mode for command ouptut') { @options[:block] = true }
+      opt.on('--match_width', 'OPTIONAL: matches hostname width for easier comparison of results') { @options[:match_width] = true }
       opt.on('--regenerate_config', 'OPTIONAL: regenerate configuration file') { @options[:regenerate_config] = true }
       opt.on('--debug', 'OPTIONAL: debug mode') { @options[:debug] = true }
     end
@@ -55,6 +56,8 @@ class Cli
     @nodes          = parse_nodes(@options[:nodes])
     @command        = parse_command(@options[:command])
     @block          = true if @options[:block]
+
+    @header_max_length = @options[:match_width] ? @nodes.max_by(&:length).length : nil
 
   rescue Interrupt
     puts "\nCtrl+C Interrupt\n"

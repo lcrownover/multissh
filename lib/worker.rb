@@ -1,5 +1,5 @@
 class Worker
-  def initialize(hostname, username, password, pkey_password, sudo_password, command, block, debug)
+  def initialize(hostname: nil, username: nil, password: nil, pkey_password: nil, sudo_password: nil, command: nil, block: nil, header_max_length: nil, debug: nil)
     @hostname       = hostname
     @username       = username
     @password       = password
@@ -8,7 +8,9 @@ class Worker
     @command        = command
     @block          = block
 
-    @header         = "#{hostname} -- "
+    @header_begin   = hostname
+    @header_padding = header_max_length ? " " * (header_max_length - hostname.length) : ""
+    @header_end     = " -- "
     @util           = Util.new(debug)
   end
 
@@ -17,6 +19,8 @@ class Worker
     @util.show_summary(self)
 
     result = ''
+    @header = @header_begin + @header_padding + @header_end
+
     begin
       Net::SSH.start(@hostname, @username, :password => @password, :passphrase => @pkey_password, :non_interactive => true) do |ssh|
         channel = ssh.open_channel do |channel, success|

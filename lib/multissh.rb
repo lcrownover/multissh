@@ -16,14 +16,15 @@ class Multissh < Cli
     tasks = []
     @nodes.each do |node|
       worker = Worker.new(
-        hostname=node.chomp, 
-        username=@username, 
-        password=@password,
-        pkey_password=@pkey_password,
-        sudo_password=@sudo_password,
-        command=@command, 
-        block=@block, 
-        debug=@debug,
+        hostname: node.chomp, 
+        username: @username, 
+        password: @password,
+        pkey_password: @pkey_password,
+        sudo_password: @sudo_password,
+        command: @command, 
+        block: @block, 
+        header_max_length: @header_max_length,
+        debug: @debug,
       )
       tasks.append(worker)
     end
