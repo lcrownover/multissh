@@ -56,6 +56,7 @@ class Util
     end
   end   
 
+
   def encrypt(s)
     if s
       ecarr = []
@@ -67,7 +68,6 @@ class Util
       ''
     end
   end
-
 
 
   def decrypt(s)
@@ -82,5 +82,26 @@ class Util
     end
   end
 
+  
+  def ssh_agent_loaded?
+    begin
+      @util.dbg('ssh-agent begin check')
+      Net::SSH::Authentication::Agent.new.connect!
+      @util.dbg('ssh-agent loaded')
+      true
+    rescue Net::SSH::Authentication::AgentNotAvailable
+      @util.dbg('ssh-agent not loaded')
+      false
+    end
+  end
+
+
+  def private_key_exist?
+    if !Dir.glob("#{%x{echo ~}.chomp}/.ssh/id_*").empty?
+      false
+    else
+      true
+    end
+  end
 
 end

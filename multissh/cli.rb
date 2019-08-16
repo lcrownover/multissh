@@ -40,11 +40,13 @@ class Cli
     @regenerate     = true if @options[:regenerate_config]
     @disable_sudo   = true if @options[:disable_sudo]
 
+    config = Config.new
+
     credential      = Credential.new(
                       username      = @username, 
                       password      = @password, 
                       pkey_password = @pkey_password, 
-                      regenerate    = @regenerate, 
+                      regenerate    = @regenerate,
                       debug         = @debug
                     )
     @username       = credential.username

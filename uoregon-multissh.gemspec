@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://www.savethemanatee.org/manatees/facts/'
   spec.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|build|dev)/}) }
   spec.executables = ["multissh"]
-  spec.require_paths = ["lib"]
+  spec.require_paths = ["multissh"]
   spec.add_runtime_dependency "colorize", [">= 0.8.1"]
   spec.add_runtime_dependency "net-ssh", [">= 5.1.0"]
   spec.add_runtime_dependency "parallel", [">= 1.12.1"]

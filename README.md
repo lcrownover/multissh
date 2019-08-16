@@ -22,7 +22,7 @@ bundle install
 ### Configuration
 
 On the first run, you'll be prompted to generate a credential file. 
-This file is stored at *~/.ssh/multissh.yaml*, with the owner as the current user and mode of 600.
+This file is stored at *~/.multissh.yaml*, with the owner as the current user and mode of 600.
 
 If you decline to generate this file, it will prompt for password if not provided via command line.
 

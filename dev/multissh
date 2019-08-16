@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/multissh'
+require_relative '../multissh/multissh'
 
 mssh = Multissh.new
 mssh.run
